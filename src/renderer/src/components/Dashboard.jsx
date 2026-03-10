@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import SqlEditor from './SqlEditor'
 import ResultsGrid from './ResultsGrid'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 function Dashboard({ connectionConfig }) {
   const [databases, setDatabases] = useState([])
@@ -65,7 +66,7 @@ function Dashboard({ connectionConfig }) {
       </aside>
 
       {/* Área Principal */}
-      <main className="flex-1 flex flex-col bg-white">
+      <main className="flex-1 flex flex-col bg-white overflow-hidden">
         {/* Barra de herramientas con botón de ejecutar */}
         <div className="p-2 bg-gray-100 border-b border-gray-300 flex items-center gap-2">
           <button
@@ -81,12 +82,17 @@ function Dashboard({ connectionConfig }) {
         </div>
 
         <div className="flex-1 relative">
-          <SqlEditor ref={editorRef} onExecute={handleExecuteQuery} />
-        </div>
-
-        {/* Panel de Resultados */}
-        <div className="h-1/3 bg-white border-t-2 border-gray-300 overflow-auto">
-          <ResultsGrid results={queryResults} error={queryError} />
+          <PanelGroup direction="vertical" className="h-full w-full">
+            <Panel defaultSize={67} minSize={20}>
+              <SqlEditor ref={editorRef} onExecute={handleExecuteQuery} />
+            </Panel>
+            <PanelResizeHandle className="h-2 flex items-center justify-center bg-gray-200 data-[resize-handle-state=hover]:bg-blue-400 data-[resize-handle-state=drag]:bg-blue-500 outline-none transition-colors">
+              <div className="w-8 h-1 bg-gray-400 rounded-full" />
+            </PanelResizeHandle>
+            <Panel defaultSize={33} minSize={10}>
+              <ResultsGrid results={queryResults} error={queryError} />
+            </Panel>
+          </PanelGroup>
         </div>
       </main>
     </div>
