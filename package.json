@@ -1,0 +1,30 @@
+{
+  "name": "mariaelectron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "dev": "vite src/renderer",
+    "build": "vite build src/renderer"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.27",
+    "electron": "^40.8.0",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.1",
+    "vite": "^5.1.0"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "mysql2": "^3.19.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
