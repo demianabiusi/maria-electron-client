@@ -7,7 +7,7 @@ import monacoEditorPlugin from 'vite-plugin-monaco-editor'
 export default defineConfig({
   plugins: [
     react(),
-    monacoEditorPlugin.default({})
+    monacoEditorPlugin({})
   ],
   base: './', // Importante para que Electron encuentre los archivos (rutas relativas)
   build: {
