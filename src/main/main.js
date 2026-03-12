@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const { testConnection, getDatabases, executeQuery } = require('./db')
+const { testConnection, getDatabases, executeQuery, getTables } = require('./db')
 const Store = require('electron-store')
 
 const store = new Store()
@@ -35,6 +35,11 @@ app.whenReady().then(() => {
   // Obtener lista de bases de datos (Fase 2: Explorador de Objetos)
   ipcMain.handle('db:get-databases', async (event, config) => {
     return await getDatabases(config);
+  });
+
+  // Obtener tablas de una base de datos
+  ipcMain.handle('db:get-tables', async (event, { config, database }) => {
+    return await getTables(config, database);
   });
 
   // Ejecutar una consulta SQL (Fase 3)

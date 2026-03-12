@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "dev": "vite src/renderer",
+    "dev:ui": "vite src/renderer",
+    "dev:mock": "node src/server/index.js",
+    "dev": "concurrently \"npm run dev:mock\" \"npm run dev:ui\"",
     "build": "vite build src/renderer"
   },
   "keywords": [],
@@ -17,7 +19,10 @@
     "@tailwindcss/postcss": "^4.2.1",
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.27",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
     "electron": "^40.8.0",
+    "express": "^5.2.1",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "vite": "^5.1.0"

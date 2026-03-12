@@ -69,4 +69,23 @@ async function executeQuery(config, sql) {
   }
 }
 
-module.exports = { testConnection, getDatabases, executeQuery };
+async function getTables(config, database) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({
+      ...config,
+      database: database, // Conectamos directamente a la base de datos seleccionada
+      port: parseInt(config.port) || 3306
+    });
+    const [rows] = await connection.execute('SHOW TABLES');
+    // El resultado es un array de objetos tipo { 'Tables_in_nombreBD': 'nombreTabla' }
+    // Usamos Objectbz.values para obtener el nombre sin importar la clave
+    return rows.map(row => Object.values(row)[0]);
+  } catch (error) {
+    throw error;
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+module.exports = { testConnection, getDatabases, executeQuery, getTables };

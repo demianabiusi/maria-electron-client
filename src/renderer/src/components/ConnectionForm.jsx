@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import api from '../api'
 
 function ConnectionForm({ onConnectSuccess }) {
   const [config, setConfig] = useState({
@@ -14,10 +15,8 @@ function ConnectionForm({ onConnectSuccess }) {
   // Cargar configuración guardada al iniciar
   useEffect(() => {
     const loadConfig = async () => {
-      if (window.db) {
-        const savedConfig = await window.db.getConfig()
+        const savedConfig = await api.getConfig()
         if (savedConfig) setConfig((prev) => ({ ...prev, ...savedConfig }))
-      }
     }
     loadConfig()
   }, [])
@@ -33,12 +32,12 @@ function ConnectionForm({ onConnectSuccess }) {
 
     try {
       // 1. Probar conexión
-      const result = await window.db.testConnection(config)
+      const result = await api.testConnection(config)
 
       if (result.success) {
         setStatus({ type: 'success', message: result.message })
         // 2. Guardar configuración si es exitosa
-        await window.db.saveConfig(config)
+        await api.saveConfig(config)
 
         // 3. Notificar al componente padre que la conexión fue exitosa
         onConnectSuccess(config)

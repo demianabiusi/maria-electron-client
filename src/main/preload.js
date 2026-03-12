@@ -14,5 +14,6 @@ contextBridge.exposeInMainWorld('db', {
   saveConfig: (config) => ipcRenderer.invoke('db:save-config', config),
   getConfig: () => ipcRenderer.invoke('db:get-config'),
   getDatabases: (config) => ipcRenderer.invoke('db:get-databases', config),
+  getTables: (config, database) => ipcRenderer.invoke('db:get-tables', { config, database }),
   executeQuery: ({ config, sql }) => ipcRenderer.invoke('db:execute-query', { config, sql })
 })
