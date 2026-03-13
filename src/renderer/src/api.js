@@ -28,14 +28,19 @@ const api = {
     return await fetchDb('test-connection', config);
   },
   
-  saveConfig: async (config) => {
-    if (isElectron) return await window.db.saveConfig(config);
-    return await fetchDb('save-config', config);
+  getConnections: async () => {
+    if (isElectron) return await window.db.getConnections();
+    return await fetchDb('get-connections');
   },
   
-  getConfig: async () => {
-    if (isElectron) return await window.db.getConfig();
-    return await fetchDb('get-config');
+  saveConnection: async (connection) => {
+    if (isElectron) return await window.db.saveConnection(connection);
+    return await fetchDb('save-connection', connection);
+  },
+  
+  deleteConnection: async (id) => {
+    if (isElectron) return await window.db.deleteConnection(id);
+    return await fetchDb('delete-connection', { id });
   },
   
   getDatabases: async (config) => {
@@ -46,6 +51,41 @@ const api = {
   getTables: async (config, database) => {
     if (isElectron) return await window.db.getTables(config, database);
     return await fetchDb('get-tables', { config, database });
+  },
+  
+  getTableColumns: async (config, database, table) => {
+    if (isElectron) return await window.db.getTableColumns(config, database, table);
+    return await fetchDb('get-table-columns', { config, database, table });
+  },
+  
+  getTableIndexes: async (config, database, table) => {
+    if (isElectron) return await window.db.getTableIndexes(config, database, table);
+    return await fetchDb('get-table-indexes', { config, database, table });
+  },
+  
+  getViews: async (config, database) => {
+    if (isElectron) return await window.db.getViews(config, database);
+    return await fetchDb('get-views', { config, database });
+  },
+  
+  getProcedures: async (config, database) => {
+    if (isElectron) return await window.db.getProcedures(config, database);
+    return await fetchDb('get-procedures', { config, database });
+  },
+  
+  getFunctions: async (config, database) => {
+    if (isElectron) return await window.db.getFunctions(config, database);
+    return await fetchDb('get-functions', { config, database });
+  },
+  
+  getTriggers: async (config, database) => {
+    if (isElectron) return await window.db.getTriggers(config, database);
+    return await fetchDb('get-triggers', { config, database });
+  },
+  
+  getEvents: async (config, database) => {
+    if (isElectron) return await window.db.getEvents(config, database);
+    return await fetchDb('get-events', { config, database });
   },
   
   executeQuery: async ({ config, sql }) => {

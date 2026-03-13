@@ -77,9 +77,9 @@ async function getTables(config, database) {
       database: database, // Conectamos directamente a la base de datos seleccionada
       port: parseInt(config.port) || 3306
     });
-    const [rows] = await connection.execute('SHOW TABLES');
-    // El resultado es un array de objetos tipo { 'Tables_in_nombreBD': 'nombreTabla' }
-    // Usamos Objectbz.values para obtener el nombre sin importar la clave
+    // Filtramos para asegurarnos que solo devolvemos BASE TABLE
+    const [rows] = await connection.execute("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'");
+    // El resultado es un array de objetos tipo { 'Tables_in_nombreBD': 'nombreTabla', 'Table_type': 'BASE TABLE' }
     return rows.map(row => Object.values(row)[0]);
   } catch (error) {
     throw error;
@@ -88,4 +88,95 @@ async function getTables(config, database) {
   }
 }
 
-module.exports = { testConnection, getDatabases, executeQuery, getTables };
+async function getViews(config, database) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({ ...config, database, port: parseInt(config.port) || 3306 });
+    const [rows] = await connection.execute("SHOW FULL TABLES WHERE Table_type = 'VIEW'");
+    return rows.map(row => Object.values(row)[0]);
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+async function getProcedures(config, database) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({ ...config, database, port: parseInt(config.port) || 3306 });
+    const [rows] = await connection.execute(`SHOW PROCEDURE STATUS WHERE Db = '${database}'`);
+    return rows.map(row => row.Name);
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+async function getFunctions(config, database) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({ ...config, database, port: parseInt(config.port) || 3306 });
+    const [rows] = await connection.execute(`SHOW FUNCTION STATUS WHERE Db = '${database}'`);
+    return rows.map(row => row.Name);
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+async function getTriggers(config, database) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({ ...config, database, port: parseInt(config.port) || 3306 });
+    const [rows] = await connection.execute(`SHOW TRIGGERS FROM \`${database}\``);
+    return rows.map(row => row.Trigger);
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+async function getEvents(config, database) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({ ...config, database, port: parseInt(config.port) || 3306 });
+    const [rows] = await connection.execute(`SHOW EVENTS FROM \`${database}\``);
+    return rows.map(row => row.Name);
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+async function getTableColumns(config, database, table) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({ ...config, database, port: parseInt(config.port) || 3306 });
+    const [rows] = await connection.execute(`SHOW COLUMNS FROM \`${table}\``);
+    // Returns array of objects with Field, Type, Null, Key, Default, Extra properties
+    return rows;
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+async function getTableIndexes(config, database, table) {
+  let connection;
+  try {
+    connection = await mysql.createConnection({ ...config, database, port: parseInt(config.port) || 3306 });
+    const [rows] = await connection.execute(`SHOW INDEX FROM \`${table}\``);
+    // Returns array of index definitions
+    return rows;
+  } finally {
+    if (connection) await connection.end();
+  }
+}
+
+module.exports = { 
+  testConnection, 
+  getDatabases, 
+  executeQuery, 
+  getTables, 
+  getViews, 
+  getProcedures, 
+  getFunctions, 
+  getTriggers, 
+  getEvents,
+  getTableColumns,
+  getTableIndexes
+};

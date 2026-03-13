@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const { testConnection, getDatabases, executeQuery, getTables } = require('./db')
+const { testConnection, getDatabases, executeQuery, getTables, getViews, getProcedures, getFunctions, getTriggers, getEvents, getTableColumns, getTableIndexes } = require('./db')
 const Store = require('electron-store')
+const crypto = require('crypto')
 
 const store = new Store()
 
@@ -42,21 +43,78 @@ app.whenReady().then(() => {
     return await getTables(config, database);
   });
 
+  // Obtener columnas de una tabla
+  ipcMain.handle('db:get-table-columns', async (event, { config, database, table }) => {
+    return await getTableColumns(config, database, table);
+  });
+
+  // Obtener índices de una tabla
+  ipcMain.handle('db:get-table-indexes', async (event, { config, database, table }) => {
+    return await getTableIndexes(config, database, table);
+  });
+
+  // Obtener vistas de una base de datos
+  ipcMain.handle('db:get-views', async (event, { config, database }) => {
+    return await getViews(config, database);
+  });
+
+  // Obtener procedimientos almacenados de una base de datos
+  ipcMain.handle('db:get-procedures', async (event, { config, database }) => {
+    return await getProcedures(config, database);
+  });
+
+  // Obtener funciones de una base de datos
+  ipcMain.handle('db:get-functions', async (event, { config, database }) => {
+    return await getFunctions(config, database);
+  });
+
+  // Obtener triggers de una base de datos
+  ipcMain.handle('db:get-triggers', async (event, { config, database }) => {
+    return await getTriggers(config, database);
+  });
+
+  // Obtener eventos de una base de datos
+  ipcMain.handle('db:get-events', async (event, { config, database }) => {
+    return await getEvents(config, database);
+  });
+
   // Ejecutar una consulta SQL (Fase 3)
   ipcMain.handle('db:execute-query', async (event, { config, sql }) => {
     return await executeQuery(config, sql);
   });
 
-  // Guardar configuración
-  ipcMain.handle('db:save-config', async (event, config) => {
-    store.set('dbConfig', config);
-    return true;
+  // --- Gestión de Conexiones (ABM) ---
+
+  // Obtener todas las conexiones guardadas
+  ipcMain.handle('db:get-connections', async () => {
+    return store.get('savedConnections', []);
   });
 
-  // Obtener configuración guardada
-  ipcMain.handle('db:get-config', async () => {
-    // Devolvemos la config guardada o un valor por defecto
-    return store.get('dbConfig', { host: 'localhost', user: 'root', password: '', port: 3306 });
+  // Guardar (Crear/Editar) una conexión
+  ipcMain.handle('db:save-connection', async (event, connection) => {
+    const connections = store.get('savedConnections', []);
+    
+    if (connection.id) {
+      // Editar existente
+      const index = connections.findIndex(c => c.id === connection.id);
+      if (index !== -1) {
+        connections[index] = { ...connections[index], ...connection };
+      }
+    } else {
+      // Crear nueva
+      connection.id = crypto.randomUUID();
+      connections.push(connection);
+    }
+    store.set('savedConnections', connections);
+    return connection;
+  });
+
+  // Eliminar una conexión
+  ipcMain.handle('db:delete-connection', async (event, id) => {
+    const connections = store.get('savedConnections', []);
+    const newConnections = connections.filter(c => c.id !== id);
+    store.set('savedConnections', newConnections);
+    return true;
   });
 
   createWindow();

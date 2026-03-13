@@ -14,7 +14,7 @@ function App() {
       {!connectionConfig ? (
         <ConnectionForm onConnectSuccess={handleConnectSuccess} />
       ) : (
-        <Dashboard connectionConfig={connectionConfig} />
+        <Dashboard connectionConfig={connectionConfig} onDisconnect={() => setConnectionConfig(null)} />
       )}
     </div>
   )
